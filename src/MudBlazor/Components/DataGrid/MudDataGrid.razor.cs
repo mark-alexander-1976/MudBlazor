@@ -2564,19 +2564,24 @@ namespace MudBlazor
             StateHasChanged();
         }
 
+        /// <summary>
+        /// Stores the column whose filter button should anchor the simple filter popover.
+        /// </summary>
         internal void SetFiltersMenuAnchor(Column<T>? column)
         {
             _filterAnchorColumn = column;
         }
 
+        /// <summary>
+        /// Indicates whether the specified column is currently anchoring the simple filter popover.
+        /// </summary>
         internal bool IsFilterMenuAnchor(Column<T>? column)
         {
-            if (!_filtersMenuVisible || FilterMode != DataGridFilterMode.Simple || FilterPopoverAnchor != DataGridFilterPopoverAnchor.FilterButton || _filterAnchorColumn is null)
-            {
-                return false;
-            }
-
-            return ReferenceEquals(_filterAnchorColumn, column);
+            return _filtersMenuVisible
+                   && FilterMode == DataGridFilterMode.Simple
+                   && FilterPopoverAnchor == DataGridFilterPopoverAnchor.FilterButton
+                   && _filterAnchorColumn is not null
+                   && ReferenceEquals(_filterAnchorColumn, column);
         }
 
         private void OnFiltersPanelClosed()
