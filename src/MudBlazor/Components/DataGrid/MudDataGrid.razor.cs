@@ -2576,8 +2576,7 @@ namespace MudBlazor
                 return false;
             }
 
-            return ReferenceEquals(_filterAnchorColumn, column)
-                || (column is not null && _filterAnchorColumn.PropertyName is not null && column.PropertyName == _filterAnchorColumn.PropertyName);
+            return ReferenceEquals(_filterAnchorColumn, column);
         }
 
         private void OnFiltersPanelClosed()
