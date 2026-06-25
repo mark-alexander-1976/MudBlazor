@@ -4610,6 +4610,69 @@ namespace MudBlazor.UnitTests.Components
         }
 
         [Test]
+        public async Task DataGrid_ColumnFilterMenu_FilterButtonAnchor_DoesNotUseCursorPositionAttributes()
+        {
+            var comp = Context.Render<DataGridServerDataColumnFilterMenuTest>(parameters => parameters
+                .Add(x => x.FilterPopoverAnchor, DataGridFilterPopoverAnchor.FilterButton));
+
+            var openPosition = new MouseEventArgs
+            {
+                PageY = 50,
+                PageX = 50
+            };
+
+            comp.Find(".filter-button").Click(openPosition);
+
+            await comp.WaitForAssertionAsync(() =>
+            {
+                var filterPopup = comp.Find(".column-filter-popup");
+                filterPopup.HasAttribute("data-pc-x").Should().BeFalse();
+                filterPopup.HasAttribute("data-pc-y").Should().BeFalse();
+            });
+        }
+
+        [Test]
+        public async Task DataGrid_SimpleFilterMenu_OpensAtCursorPositionByDefault()
+        {
+            var comp = Context.Render<DataGridFiltersTest>();
+
+            var openPosition = new MouseEventArgs
+            {
+                PageY = 75,
+                PageX = 125
+            };
+
+            comp.Find(".filter-button").Click(openPosition);
+
+            await comp.WaitForAssertionAsync(() =>
+            {
+                var filterPopup = comp.Find(".filters-panel");
+                filterPopup.GetAttribute("data-pc-x").Should().Be(openPosition.PageX.ToString(CultureInfo.InvariantCulture));
+                filterPopup.GetAttribute("data-pc-y").Should().Be(openPosition.PageY.ToString(CultureInfo.InvariantCulture));
+            });
+        }
+
+        [Test]
+        public async Task DataGrid_SimpleFilterMenu_FilterButtonAnchor_DoesNotUseCursorPositionAttributes()
+        {
+            var comp = Context.Render<DataGridFiltersTest>(parameters => parameters
+                .Add(x => x.FilterPopoverAnchor, DataGridFilterPopoverAnchor.FilterButton));
+
+            comp.Find(".filter-button").Click(new MouseEventArgs
+            {
+                PageY = 75,
+                PageX = 125
+            });
+
+            await comp.WaitForAssertionAsync(() =>
+            {
+                var filterPopup = comp.Find(".filters-panel");
+                filterPopup.HasAttribute("data-pc-x").Should().BeFalse();
+                filterPopup.HasAttribute("data-pc-y").Should().BeFalse();
+            });
+        }
+
+        [Test]
         public async Task DataGridServerDataColumnFilterMenuApplyTwice()
         {
             var comp = Context.Render<DataGridServerDataColumnFilterMenuTest>();

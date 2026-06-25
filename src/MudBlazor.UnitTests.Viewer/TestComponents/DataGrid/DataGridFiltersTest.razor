@@ -1,7 +1,7 @@
 ﻿
 <MudPopoverProvider></MudPopoverProvider>
 
-<MudDataGrid Items="@_items" Filterable="true">
+<MudDataGrid Items="@_items" Filterable="true" FilterPopoverAnchor="@FilterPopoverAnchor">
     <Columns>
         <PropertyColumn Property="x => x.Name" />
         <PropertyColumn Property="x => x.Age" />
@@ -21,6 +21,9 @@
         new Model("Ira", 27, Severity.Success, true, new DateTime(2011, 1, 2), new DateOnly(2011, 1, 2), null),
         new Model("John", 32, Severity.Warning, false, null, new DateOnly(2022, 6, 15), null)
     };
+
+    [Parameter]
+    public DataGridFilterPopoverAnchor FilterPopoverAnchor { get; set; }
 
     public record Model (string Name, int? Age, Severity? Status, bool? Hired, DateTime? HiredOn, DateOnly? StartDate, Guid? ApplicationId);
 }

@@ -221,11 +221,14 @@ namespace MudBlazor
             }
         }
 
-        private Dictionary<string, object> PositionAttributes => new()
-        {
-            { "data-pc-x", _filtersMenuPosition.Left.ToString(System.Globalization.CultureInfo.InvariantCulture) },
-            { "data-pc-y", _filtersMenuPosition.Top.ToString(System.Globalization.CultureInfo.InvariantCulture) }
-        };
+        private Dictionary<string, object> PositionAttributes =>
+            DataGrid?.FilterPopoverAnchor == DataGridFilterPopoverAnchor.Cursor
+                ? new Dictionary<string, object>
+                {
+                    { "data-pc-x", _filtersMenuPosition.Left.ToString(System.Globalization.CultureInfo.InvariantCulture) },
+                    { "data-pc-y", _filtersMenuPosition.Top.ToString(System.Globalization.CultureInfo.InvariantCulture) }
+                }
+                : new Dictionary<string, object>();
 
         #endregion
         protected override async Task OnParametersSetAsync()
@@ -548,6 +551,7 @@ namespace MudBlazor
                 }
 
                 DataGrid.SetFiltersMenuPosition(args.PageY, args.PageX);
+                DataGrid.SetFiltersMenuAnchor(Column);
                 DataGrid.OpenFilters(filterDefinitionToFocus.Id);
             }
             else if (DataGrid.FilterMode == DataGridFilterMode.ColumnFilterMenu)
@@ -570,6 +574,7 @@ namespace MudBlazor
                         (Column?.PropertyName is not null && x.Column?.PropertyName == Column.PropertyName));
 
                 DataGrid.SetFiltersMenuPosition(args.PageY, args.PageX);
+                DataGrid.SetFiltersMenuAnchor(Column);
                 DataGrid.OpenFilters(filterDefinitionToFocus?.Id);
             }
             else if (DataGrid.FilterMode == DataGridFilterMode.ColumnFilterMenu)

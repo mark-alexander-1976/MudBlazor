@@ -1,0 +1,42 @@
+@using MudBlazor.Examples.Data.Models
+@namespace MudBlazor.Docs.Examples
+
+<MudDataGrid Items="@_elements" Filterable="true" FilterMode="@_filterMode" FilterPopoverAnchor="@_filterPopoverAnchor" RowsPerPage="5">
+    <Columns>
+        <PropertyColumn Property="x => x.Number" Title="Nr" Filterable="false" />
+        <PropertyColumn Property="x => x.Sign" />
+        <PropertyColumn Property="x => x.Name" />
+        <PropertyColumn Property="x => x.Molar" Title="Molar mass" />
+        <PropertyColumn Property="x => x.Group" Title="Category" />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="Element" PageSizeOptions="new[] { 5 }" />
+    </PagerContent>
+</MudDataGrid>
+
+<div class="d-flex flex-wrap mt-4 gap-6">
+    <MudRadioGroup T="DataGridFilterMode" @bind-Value="_filterMode">
+        <MudRadio Dense="true" Value="@DataGridFilterMode.Simple" Color="Color.Primary">Simple</MudRadio>
+        <MudRadio Dense="true" Value="@DataGridFilterMode.ColumnFilterMenu" Color="Color.Tertiary">Column Menu</MudRadio>
+    </MudRadioGroup>
+
+    <MudRadioGroup T="DataGridFilterPopoverAnchor" @bind-Value="_filterPopoverAnchor">
+        <MudRadio Dense="true" Value="@DataGridFilterPopoverAnchor.Cursor" Color="Color.Primary">Cursor</MudRadio>
+        <MudRadio Dense="true" Value="@DataGridFilterPopoverAnchor.FilterButton" Color="Color.Tertiary">Filter Button</MudRadio>
+    </MudRadioGroup>
+</div>
+
+@code {
+    private readonly List<Element> _elements = CreateElements();
+    private DataGridFilterMode _filterMode = DataGridFilterMode.Simple;
+    private DataGridFilterPopoverAnchor _filterPopoverAnchor = DataGridFilterPopoverAnchor.FilterButton;
+
+    private static List<Element> CreateElements() =>
+    [
+        new() { Number = 1, Sign = "H", Name = "Hydrogen", Molar = 1.008, Group = "Nonmetal" },
+        new() { Number = 2, Sign = "He", Name = "Helium", Molar = 4.0026, Group = "Noble Gas" },
+        new() { Number = 3, Sign = "Li", Name = "Lithium", Molar = 6.94, Group = "Alkali Metal" },
+        new() { Number = 4, Sign = "Be", Name = "Beryllium", Molar = 9.0122, Group = "Alkaline Earth Metal" },
+        new() { Number = 5, Sign = "B", Name = "Boron", Molar = 10.81, Group = "Metalloid" }
+    ];
+}

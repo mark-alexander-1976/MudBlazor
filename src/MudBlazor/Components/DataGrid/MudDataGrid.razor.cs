@@ -50,6 +50,7 @@ namespace MudBlazor
         private (double Top, double Left) _filtersMenuPosition = (0, 0);
         private (double Top, double Left) _columnsPanelPosition = (0, 0);
         private Guid? _filterDefinitionIdToFocus;
+        private Column<T>? _filterAnchorColumn;
 
         private readonly ParameterState<T?> _selectedItemState;
         private readonly ParameterState<HashSet<T>?> _selectedItemsState;
@@ -58,11 +59,22 @@ namespace MudBlazor
         /// <summary>
         /// Inline data attributes for positioning the menu at the cursor's location.
         /// </summary>
-        internal Dictionary<string, object> FiltersPositionAttributes => new()
-        {
-            { "data-pc-x", _filtersMenuPosition.Left.ToString(CultureInfo.InvariantCulture) },
-            { "data-pc-y", _filtersMenuPosition.Top.ToString(CultureInfo.InvariantCulture) }
-        };
+        internal Dictionary<string, object> FiltersPositionAttributes =>
+            FilterPopoverAnchor == DataGridFilterPopoverAnchor.Cursor
+                ? new Dictionary<string, object>
+                {
+                    { "data-pc-x", _filtersMenuPosition.Left.ToString(CultureInfo.InvariantCulture) },
+                    { "data-pc-y", _filtersMenuPosition.Top.ToString(CultureInfo.InvariantCulture) }
+                }
+                : new Dictionary<string, object>();
+
+        internal Origin FilterPopoverAnchorOrigin =>
+            FilterPopoverAnchor == DataGridFilterPopoverAnchor.Cursor ? Origin.TopLeft : Origin.BottomLeft;
+
+        internal Origin FilterPopoverTransformOrigin => Origin.TopLeft;
+
+        internal bool UseGridLevelSimpleFilterPopover =>
+            _filtersMenuVisible && FilterMode == DataGridFilterMode.Simple && (FilterPopoverAnchor == DataGridFilterPopoverAnchor.Cursor || _filterAnchorColumn is null);
 
         internal Dictionary<string, object> ColumnsPanelPositionAttributes => new()
         {
@@ -677,6 +689,17 @@ namespace MudBlazor
         /// </remarks>
         [Parameter]
         public DataGridFilterMode FilterMode { get; set; }
+
+        /// <summary>
+        /// Controls where the filter popover opens.
+        /// </summary>
+        /// <remarks>
+        /// Defaults to <see cref="DataGridFilterPopoverAnchor.Cursor"/>. When set to <see cref="DataGridFilterPopoverAnchor.FilterButton"/>,
+        /// the popover anchors to the filter button instead of the cursor position.
+        /// </remarks>
+        [Parameter]
+        [Category(CategoryTypes.DataGrid.Filtering)]
+        public DataGridFilterPopoverAnchor FilterPopoverAnchor { get; set; } = DataGridFilterPopoverAnchor.Cursor;
 
         /// <summary>
         /// The case sensitivity setting for columns with <c>string</c> values.
@@ -1972,6 +1995,7 @@ namespace MudBlazor
             filterDefinition.Column = column;
             FilterDefinitions.Add(filterDefinition);
             _filterDefinitionIdToFocus = filterDefinition.Id;
+            _filterAnchorColumn = null;
             _filtersMenuVisible = true;
             StateHasChanged();
         }
@@ -1979,6 +2003,7 @@ namespace MudBlazor
         internal Task ApplyFiltersAsync()
         {
             _filtersMenuVisible = false;
+            _filterAnchorColumn = null;
             return InvokeServerLoadFunc();
         }
 
@@ -1992,6 +2017,7 @@ namespace MudBlazor
         public Task CloseFilterAsync()
         {
             _filtersMenuVisible = false;
+            _filterAnchorColumn = null;
             CleanupIncompleteFilters();
             StateHasChanged();
             return Task.CompletedTask;
@@ -2507,6 +2533,10 @@ namespace MudBlazor
         public void ToggleFiltersMenu()
         {
             _filtersMenuVisible = !_filtersMenuVisible;
+            if (!_filtersMenuVisible)
+            {
+                _filterAnchorColumn = null;
+            }
             StateHasChanged();
         }
 
@@ -2523,6 +2553,7 @@ namespace MudBlazor
         /// </summary>
         public void OpenFilters()
         {
+            _filterAnchorColumn = null;
             OpenFilters(FilterDefinitions.FirstOrDefault()?.Id);
         }
 
@@ -2533,7 +2564,27 @@ namespace MudBlazor
             StateHasChanged();
         }
 
-        private void OnFiltersPanelClosed() => CleanupIncompleteFilters();
+        internal void SetFiltersMenuAnchor(Column<T>? column)
+        {
+            _filterAnchorColumn = column;
+        }
+
+        internal bool IsFilterMenuAnchor(Column<T>? column)
+        {
+            if (!_filtersMenuVisible || FilterMode != DataGridFilterMode.Simple || FilterPopoverAnchor != DataGridFilterPopoverAnchor.FilterButton || _filterAnchorColumn is null)
+            {
+                return false;
+            }
+
+            return ReferenceEquals(_filterAnchorColumn, column)
+                || (_filterAnchorColumn.PropertyName is not null && column?.PropertyName == _filterAnchorColumn.PropertyName);
+        }
+
+        private void OnFiltersPanelClosed()
+        {
+            _filterAnchorColumn = null;
+            CleanupIncompleteFilters();
+        }
 
         internal void CleanupIncompleteFilters() => FilterDefinitions.RemoveAll(p => p.Value == null && ValueRequired(p));
         internal void SetFiltersMenuPosition(double top, double left)

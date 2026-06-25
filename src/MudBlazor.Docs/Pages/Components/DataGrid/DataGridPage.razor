@@ -239,6 +239,18 @@
             </DocsPageSection>
 
             <DocsPageSection>
+                <SectionHeader Title="Filter Popover Anchoring">
+                    <Description>
+                        Set <CodeInline>FilterPopoverAnchor</CodeInline> to control whether filter popovers open at the cursor or stay attached to the filter button that opened them.
+                        This works with both <CodeInline>DataGridFilterMode.Simple</CodeInline> and <CodeInline>DataGridFilterMode.ColumnFilterMenu</CodeInline>.
+                    </Description>
+                </SectionHeader>
+                <SectionContent DarkenBackground="true" Code="@nameof(DataGridFilterPopoverAnchorExample)" ShowCode="false" Block="true" FullWidth="true">
+                    <DataGridFilterPopoverAnchorExample />
+                </SectionContent>
+            </DocsPageSection>
+
+            <DocsPageSection>
                 <SectionHeader Title="Row and Menu FilterTemplate">
                     <Description>
                         <CodeInline>&lt;Column&gt;.&lt;FilterTemplate&gt;</CodeInline> also works in <CodeInline>DataGridFilterMode.ColumnFilterRow</CodeInline> and <CodeInline>DataGridFilterMode.ColumnFilterMenu</CodeInline>. These modes also use <CodeInline>FilterContext&lt;T&gt;</CodeInline>, so the same context shape is reused while <CodeInline>Actions</CodeInline> operate on the currently rendered filter UI.
