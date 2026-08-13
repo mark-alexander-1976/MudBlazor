@@ -167,6 +167,13 @@ else if (Column != null && !Column.HiddenState.Value)
                 }
             </MudPopover>
         }
+        @if (filterable && DataGrid.IsFilterMenuAnchor(Column))
+        {
+            <MudPopover Open="true" Paper="true" Class="filters-panel pa-2" OverflowBehavior="OverflowBehavior.FlipOnOpen" AnchorOrigin="@Origin.BottomLeft"
+                        TransformOrigin="@Origin.TopLeft" Elevation="4" Style="width:700px;max-width:700px;" MaxHeight="400">
+                @DataGrid.SimpleFilterPopoverContent
+            </MudPopover>
+        }
         </text>;
     }
 
